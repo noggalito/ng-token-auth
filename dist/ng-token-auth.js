@@ -95,8 +95,8 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
       return configs;
     },
     $get: [
-      '$http', '$q', '$location', 'ipCookie', '$window', '$timeout', '$rootScope', '$interpolate', '$interval', (function(_this) {
-        return function($http, $q, $location, ipCookie, $window, $timeout, $rootScope, $interpolate, $interval) {
+      '$http', '$q', '$location', 'ipCookie', '$window', '$timeout', '$rootScope', '$interpolate', '$interval', '$localStorage', (function(_this) {
+        return function($http, $q, $location, ipCookie, $window, $timeout, $rootScope, $interpolate, $interval, $localStorage) {
           return {
             header: null,
             dfd: null,
@@ -623,7 +623,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               } else {
                 switch (this.getConfig(configName).storage) {
                   case 'localStorage':
-                    return $window.localStorage.setItem(key, JSON.stringify(val));
+                    return $localStorage.setItem(key, JSON.stringify(val));
                   case 'sessionStorage':
                     return $window.sessionStorage.setItem(key, JSON.stringify(val));
                   default:
@@ -639,7 +639,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
                 } else {
                   switch (this.getConfig().storage) {
                     case 'localStorage':
-                      return JSON.parse($window.localStorage.getItem(key));
+                      return JSON.parse($localStorage.getItem(key));
                     case 'sessionStorage':
                       return JSON.parse($window.sessionStorage.getItem(key));
                     default:
@@ -662,7 +662,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               }
               switch (this.getConfig().storage) {
                 case 'localStorage':
-                  return $window.localStorage.removeItem(key);
+                  return $localStorage.removeItem(key);
                 case 'sessionStorage':
                   return $window.sessionStorage.removeItem(key);
                 default:
@@ -735,7 +735,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               key = 'currentConfigName';
               if (this.hasLocalStorage()) {
                 if (c == null) {
-                  c = JSON.parse($window.localStorage.getItem(key));
+                  c = JSON.parse($localStorage.getItem(key));
                 }
               } else if (this.hasSessionStorage()) {
                 if (c == null) {
@@ -766,8 +766,8 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
               if (this._hasLocalStorage == null) {
                 this._hasLocalStorage = false;
                 try {
-                  $window.localStorage.setItem('ng-token-auth-test', 'ng-token-auth-test');
-                  $window.localStorage.removeItem('ng-token-auth-test');
+                  $localStorage.setItem('ng-token-auth-test', 'ng-token-auth-test');
+                  $localStorage.removeItem('ng-token-auth-test');
                   this._hasLocalStorage = true;
                 } catch (_error) {
                   error = _error;
@@ -856,7 +856,7 @@ angular.module('ng-token-auth', ['ipCookie']).provider('$auth', function() {
     });
   }
 ]).run([
-  '$auth', '$window', '$rootScope', function($auth, $window, $rootScope) {
+  '$auth', '$window', '$rootScope', '$localStorage', function($auth, $window, $rootScope, $localStorage) {
     return $auth.initialize();
   }
 ]);

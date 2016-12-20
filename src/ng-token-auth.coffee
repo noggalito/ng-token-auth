@@ -105,7 +105,8 @@ angular.module('ng-token-auth', ['ipCookie'])
         '$rootScope'
         '$interpolate'
         '$interval'
-        ($http, $q, $location, ipCookie, $window, $timeout, $rootScope, $interpolate, $interval) =>
+        '$localStorage'
+        ($http, $q, $location, ipCookie, $window, $timeout, $rootScope, $interpolate, $interval, $localStorage) =>
           header:            null
           dfd:               null
           user:              {}
@@ -704,7 +705,7 @@ angular.module('ng-token-auth', ['ipCookie'])
             else
               switch @getConfig(configName).storage
                 when 'localStorage'
-                  $window.localStorage.setItem(key, JSON.stringify(val))
+                  $localStorage.setItem(key, JSON.stringify(val))
                 when 'sessionStorage'
                   $window.sessionStorage.setItem(key, JSON.stringify(val))
                 else
@@ -718,7 +719,7 @@ angular.module('ng-token-auth', ['ipCookie'])
               else
                 switch @getConfig().storage
                   when 'localStorage'
-                    JSON.parse($window.localStorage.getItem(key))
+                    JSON.parse($localStorage.getItem(key))
                   when 'sessionStorage'
                     JSON.parse($window.sessionStorage.getItem(key))
                   else ipCookie(key)
@@ -735,7 +736,7 @@ angular.module('ng-token-auth', ['ipCookie'])
               @getConfig().storage.deleteData(key);
             switch @getConfig().storage
               when 'localStorage'
-                $window.localStorage.removeItem(key)
+                $localStorage.removeItem(key)
               when 'sessionStorage'
                 $window.sessionStorage.removeItem(key)
               else
@@ -824,7 +825,7 @@ angular.module('ng-token-auth', ['ipCookie'])
             key = 'currentConfigName'
 
             if @hasLocalStorage()
-              c ?= JSON.parse($window.localStorage.getItem(key))
+              c ?= JSON.parse($localStorage.getItem(key))
             else if @hasSessionStorage()
               c ?= JSON.parse($window.sessionStorage.getItem(key))
 
@@ -853,8 +854,8 @@ angular.module('ng-token-auth', ['ipCookie'])
               # trying to call setItem will
               # throw an error if localStorage is disabled
               try
-                $window.localStorage.setItem('ng-token-auth-test', 'ng-token-auth-test');
-                $window.localStorage.removeItem('ng-token-auth-test');
+                $localStorage.setItem('ng-token-auth-test', 'ng-token-auth-test');
+                $localStorage.removeItem('ng-token-auth-test');
                 @_hasLocalStorage = true
               catch error
 
@@ -931,8 +932,13 @@ angular.module('ng-token-auth', ['ipCookie'])
     )
   ])
 
-  .run(['$auth', '$window', '$rootScope', ($auth, $window, $rootScope) ->
-    $auth.initialize()
+  .run([
+    '$auth',
+    '$window',
+    '$rootScope',
+    '$localStorage',
+    ($auth, $window, $rootScope, $localStorage) ->
+      $auth.initialize()
   ])
 
 # ie8 and ie9 require special handling
